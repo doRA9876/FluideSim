@@ -1,0 +1,52 @@
+﻿#pragma kernel SampleCS
+
+static const float PI = 3.14159265f;
+static const float delta = 5.0f;
+
+float3 _Position;
+float3 _Vector;
+
+RWTexture2D<float4> _PositionMap;
+float _Time;
+
+float Random(float3 x)
+{
+    return frac(sin(dot(x, float3(12.9898, 78.233, 19.521))) * 43758.5453);
+}
+
+float3 RandomOnSphere(float3 x)
+{
+    float z = Random(x) * 2.0 - 1.0;
+    float phi = Random(x + float3(11.42, 17.35, 23.79)) * 2.0 * PI;
+    float l = sqrt(1.0 - z * z);
+    return float3(l * cos(phi), l * sin(phi), z);
+}
+
+// ref: http://www.chilliant.com/rgb2hsv.html
+float3 HUEToRGB(float h)
+{
+    float r = abs(h * 6.0 - 3.0) - 1.0;
+    float g = 2.0 - abs(h * 6.0 - 2.0);
+    float b = 2.0 - abs(h * 6.0 - 4.0);
+    return saturate(float3(r, g, b));
+}
+
+/*
+[numthreads(32,32,1)]
+void SampleCS (uint3 id : SV_DispatchThreadID)
+{
+    float3 center = 3.0 * float3(cos(_Time), sin(_Time), 0.0);
+    float3 position = center + RandomOnSphere(float3(id.xy, _Time));
+    _PositionMap[id.xy] = float4(position, 0.0);
+}
+*/
+
+[numthreads(32,32,1)]
+void SampleCS (uint3 id : SV_DispatchThreadID)
+{
+  _Vector = _Vector + float3(cos(_Time), sin(_Time) , 1.0) * delta;
+  _Position = _Position + _Vector * delta;
+  float3 center = 1.5f * _Position;
+  float3 position = center + RandomOnSphere(float3(id.xy, _Time));
+  _PositionMap[id.xy] = float4(position, 0.0);
+}
