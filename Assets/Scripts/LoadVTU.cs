@@ -2,16 +2,11 @@ using UnityEngine;
 using System.Xml.Linq;  //重要
 using System.Collections.Generic;
 
-public class LoadVTU : MonoBehaviour
+public class LoadVTU
 {
-  void Start()
+  public Vector3[] LoadData(string filePath)
   {
-    string path = Application.dataPath + "/../Data/particle_0000.vtu";
-    LoadData(path);
-  }
-
-  private void LoadData(string filePath)
-  {
+    // string path = Application.dataPath + "/../Data/particle_0000.vtu";
     //ディレクトリ指定してファイルを読み込み
     var xml = XDocument.Load(filePath);
 
@@ -38,10 +33,14 @@ public class LoadVTU : MonoBehaviour
       pointsArray[i - 1] = new Vector3(x, y, z);
     }
 
+    return pointsArray;
+    /*
+    //  require monobihaviour
     foreach (var item in pointsArray)
     {
       Debug.Log(item.x + " " + item.y + " " + item.z + "\n");
     }
+    */
   }
 }
 
