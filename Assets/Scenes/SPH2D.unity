@@ -387,7 +387,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1446452053}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: -10}
+  m_LocalPosition: {x: 0.5, y: 0.5, z: -2}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -543,8 +543,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cs_shader: {fileID: 7200000, guid: e018b8ab242e89a4cba9af4f450835ed, type: 3}
-  width: 32
-  height: 16
 --- !u!73398921 &1706795153
 VFXRenderer:
   m_ObjectHideFlags: 2

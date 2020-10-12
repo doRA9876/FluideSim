@@ -22,8 +22,8 @@ public class VFXdrawVTU : MonoBehaviour
   }
 
   [SerializeField] ComputeShader cs_shader;
-  [SerializeField] int width = 128;
-  [SerializeField] int height = 128;
+  int width = 1;
+  int height = 1;
 
   string dataDirectory;
 
@@ -40,12 +40,23 @@ public class VFXdrawVTU : MonoBehaviour
 
   private ComputeBuffer positionArrayBuffer;
 
+  void Awake()
+  {
+    Application.targetFrameRate = 50;
+  }
+
   void Start()
   {
     dataDirectory = Application.dataPath + "/../Data/particle-2D/";
     simulation = GetPositionArray();
     particleNum = positionArray.Length;
-    if(!SystemInfo.supportsComputeShaders)
+    /*
+    width = Mathf.CeilToInt(Mathf.Sqrt(particleNum));
+    height = Mathf.CeilToInt((float)particleNum / width);
+    */
+    width = 32;
+    height = 32;
+    if (!SystemInfo.supportsComputeShaders)
     {
       return;
     }
@@ -53,12 +64,8 @@ public class VFXdrawVTU : MonoBehaviour
     InitBuffers();
     SetupAttributeMaps();
 
-    /*
-    foreach(var item in positionArray)
-    {
-      Debug.Log(item);
-    }
-    */
+    Debug.Log("particle number : " + particleNum);
+    Debug.Log(string.Format("width : {0}, height : {1}\n", width, height));
   }
 
   void Update()
@@ -69,6 +76,7 @@ public class VFXdrawVTU : MonoBehaviour
       UpdateAttributeMaps();
       simulation = GetPositionArray();
     }
+    // Debug.Log(xmlNum);
   }
 
   void SetupAttributeMaps()
@@ -136,7 +144,7 @@ public class VFXdrawVTU : MonoBehaviour
   {
     string path = dataDirectory + "particle_" + string.Format("{0:0000}", xmlNum) + ".vtu";
     xmlNum++;
-    if(!File.Exists(path))
+    if (!File.Exists(path))
     {
       return false;
     }
