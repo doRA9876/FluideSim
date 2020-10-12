@@ -1,6 +1,7 @@
 ﻿using System.Runtime.InteropServices;
 using System.IO;
 using System.Xml.Linq;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.VFX;
 
@@ -22,6 +23,7 @@ public class VFXdrawVTU : MonoBehaviour
   }
 
   [SerializeField] ComputeShader cs_shader;
+  [SerializeField] int FrameRate = 50;
   int width = 1;
   int height = 1;
 
@@ -42,7 +44,7 @@ public class VFXdrawVTU : MonoBehaviour
 
   void Awake()
   {
-    Application.targetFrameRate = 50;
+    Application.targetFrameRate = FrameRate;
   }
 
   void Start()
@@ -63,6 +65,7 @@ public class VFXdrawVTU : MonoBehaviour
     vfx = GetComponent<VisualEffect>();
     InitBuffers();
     SetupAttributeMaps();
+
 
     Debug.Log("particle number : " + particleNum);
     Debug.Log(string.Format("width : {0}, height : {1}\n", width, height));

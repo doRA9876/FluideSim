@@ -543,6 +543,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cs_shader: {fileID: 7200000, guid: e018b8ab242e89a4cba9af4f450835ed, type: 3}
+  FrameRate: 10
 --- !u!73398921 &1706795153
 VFXRenderer:
   m_ObjectHideFlags: 2
