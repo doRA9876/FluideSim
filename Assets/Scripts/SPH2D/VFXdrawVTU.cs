@@ -25,6 +25,8 @@ public class VFXdrawVTU : MonoBehaviour
   [SerializeField] int width = 128;
   [SerializeField] int height = 128;
 
+  string dataDirectory;
+
   int particleNum = 0;
   int xmlNum = 0;
   bool simulation = true;
@@ -40,6 +42,7 @@ public class VFXdrawVTU : MonoBehaviour
 
   void Start()
   {
+    dataDirectory = Application.dataPath + "/../Data/particle-2D/";
     simulation = GetPositionArray();
     particleNum = positionArray.Length;
     if(!SystemInfo.supportsComputeShaders)
@@ -131,7 +134,7 @@ public class VFXdrawVTU : MonoBehaviour
 
   bool GetPositionArray()
   {
-    string path = Application.dataPath + "/../Data/particle_" + string.Format("{0:0000}", xmlNum) + ".vtu";
+    string path = dataDirectory + "particle_" + string.Format("{0:0000}", xmlNum) + ".vtu";
     xmlNum++;
     if(!File.Exists(path))
     {
