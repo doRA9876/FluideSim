@@ -1,0 +1,16 @@
+﻿// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+
+#define THREAD_SIZE_X 32
+#define THREAD_SIZE_Y 32
+#define THREAD_SIZE_Z 1
+
+RWTexture2D<float4> _PositionMap;
+RWStructuredBuffer<float3> _PositionArray;
+
+[numthreads(THREAD_SIZE_X, THREAD_SIZE_Y, THREAD_SIZE_Z)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+  float3 position = _PositionArray[id.y * THREAD_SIZE_X + id.x];
+  _PositionMap[id.xy] = float4(position, 0);
+}
