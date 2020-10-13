@@ -1,5 +1,4 @@
-﻿// Each #kernel tells which function to compile; you can have many kernels
-#pragma kernel CSMain
+﻿#pragma kernel CSMain
 
 #define THREAD_SIZE_X 32
 #define THREAD_SIZE_Y 32
