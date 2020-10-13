@@ -82,6 +82,11 @@ public class VFXdrawVTU : MonoBehaviour
     // Debug.Log(xmlNum);
   }
 
+  private void OnDestroy()
+  {
+    DeleteBuffer(positionArrayBuffer);
+  }
+
   void SetupAttributeMaps()
   {
     positionMap = new RenderTexture(width, height, 0, RenderTextureFormat.ARGBFloat);
@@ -103,15 +108,7 @@ public class VFXdrawVTU : MonoBehaviour
     cs_shader.Dispatch(kernel, 1, 1, 1);
   }
 
-  void InitBuffers()
-  {
-    positionArrayBuffer = new ComputeBuffer(particleNum, Marshal.SizeOf(typeof(Vector3)));
-  }
-
-  void UpdateBuffers()
-  {
-    positionArrayBuffer.SetData(positionArray);
-  }
+  
 
   private Vector3[] LoadVTU(string filePath)
   {
@@ -153,5 +150,24 @@ public class VFXdrawVTU : MonoBehaviour
     }
     positionArray = LoadVTU(path);
     return true;
+  }
+
+  void InitBuffers()
+  {
+    positionArrayBuffer = new ComputeBuffer(particleNum, Marshal.SizeOf(typeof(Vector3)));
+  }
+
+  void UpdateBuffers()
+  {
+    positionArrayBuffer.SetData(positionArray);
+  }
+
+  void DeleteBuffer(ComputeBuffer buffer)
+  {
+    if(buffer != null)
+    {
+      buffer.Release();
+      buffer = null;
+    }
   }
 }
