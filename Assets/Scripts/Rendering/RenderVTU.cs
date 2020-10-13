@@ -133,19 +133,6 @@ public class RenderVTU : MonoBehaviour
     cs_shader.Dispatch(kernel, 1, 1, 1);
   }
 
-  void InitBuffers()
-  {
-    positionArrayBuffer = new ComputeBuffer(particleNum, Marshal.SizeOf(typeof(Vector3)));
-  }
-
-<<<<<<< HEAD:Assets/Scripts/SPH2D/VFXdrawVTU.cs
-  void UpdateBuffers()
-  {
-    positionArrayBuffer.SetData(positionArray);
-  }
-
-=======
->>>>>>> develop:Assets/Scripts/Rendering/RenderVTU.cs
   private Vector3[] LoadVTU(string filePath)
   {
     var vtu = XDocument.Load(filePath);
@@ -188,25 +175,6 @@ public class RenderVTU : MonoBehaviour
   void DeleteBuffer(ComputeBuffer buffer)
   {
     if (buffer != null)
-    {
-      buffer.Release();
-      buffer = null;
-    }
-  }
-
-  void InitBuffers()
-  {
-    positionArrayBuffer = new ComputeBuffer(particleNum, Marshal.SizeOf(typeof(Vector3)));
-  }
-
-  void UpdateBuffers()
-  {
-    positionArrayBuffer.SetData(positionArray);
-  }
-
-  void DeleteBuffer(ComputeBuffer buffer)
-  {
-    if(buffer != null)
     {
       buffer.Release();
       buffer = null;

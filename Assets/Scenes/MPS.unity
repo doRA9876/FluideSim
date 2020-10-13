@@ -353,7 +353,7 @@ GameObject:
   - component: {fileID: 1706795153}
   - component: {fileID: 1706795152}
   m_Layer: 0
-  m_Name: SPH2D
+  m_Name: Fluide
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
