@@ -22,25 +22,29 @@ public class VFXdrawVTU : MonoBehaviour
     }
   }
 
+  ThreadSize threadSize;
   [SerializeField] ComputeShader cs_shader;
   [SerializeField] int FrameRate = 50;
-  int width = 1;
-  int height = 1;
 
+  //VTU File
   string dataDirectory;
+  int vtuNum = 0;
 
-  int particleNum = 0;
-  int xmlNum = 0;
+  // Simulation
   bool simulation = true;
-
-  VisualEffect vfx;
-  RenderTexture positionMap;
-  int kernel;
-  ThreadSize threadSize;
-
+  int particleNum = 0;
   Vector3[] positionArray;
 
+
+  // Power Computing
+  int kernel;
   private ComputeBuffer positionArrayBuffer;
+
+  // Visual Effect Graphics
+  VisualEffect vfx;
+  RenderTexture positionMap;
+  int mapWidth, mapHeight;
+
 
   void Awake()
   {
@@ -49,42 +53,65 @@ public class VFXdrawVTU : MonoBehaviour
 
   void Start()
   {
-    dataDirectory = Application.dataPath + "/../Data/particle-2D/";
-    simulation = GetPositionArray();
-    particleNum = positionArray.Length;
-    /*
-    width = Mathf.CeilToInt(Mathf.Sqrt(particleNum));
-    height = Mathf.CeilToInt((float)particleNum / width);
-    */
-    width = 32;
-    height = 32;
     if (!SystemInfo.supportsComputeShaders)
     {
       return;
     }
+
+    dataDirectory = Application.dataPath + "/../Data/particle-2D/";
+
+    string firstFilePath = dataDirectory + "particle_" + string.Format("{0:0000}", vtuNum) + ".vtu";
+    if (!File.Exists(firstFilePath))
+    {
+      simulation = false;
+      return;
+    }
+
+    positionArray = LoadVTU(firstFilePath);
+    particleNum = positionArray.Length;
+    /*
+    mapWidth = Mathf.CeilToInt(Mathf.Sqrt(particleNum));
+    mapHeight = Mathf.CeilToInt((float)particleNum / mapWidth);
+    */
+    mapWidth = mapHeight = 32;
+
     vfx = GetComponent<VisualEffect>();
     InitBuffers();
     SetupAttributeMaps();
 
-
     Debug.Log("particle number : " + particleNum);
-    Debug.Log(string.Format("width : {0}, height : {1}\n", width, height));
+    Debug.Log(string.Format("width : {0}, height : {1}\n", mapWidth, mapHeight));
   }
 
   void Update()
   {
     if (simulation)
     {
+      string path = dataDirectory + "particle_" + string.Format("{0:0000}", vtuNum) + ".vtu";
+      if (File.Exists(path))
+      {
+        vtuNum++;
+        positionArray = LoadVTU(path);
+        simulation = true;
+      }
+      else
+      {
+        simulation = false;
+      }
       UpdateBuffers();
       UpdateAttributeMaps();
-      simulation = GetPositionArray();
     }
     // Debug.Log(xmlNum);
   }
 
+  void OnDestroy()
+  {
+    DeleteBuffer(positionArrayBuffer);
+  }
+
   void SetupAttributeMaps()
   {
-    positionMap = new RenderTexture(width, height, 0, RenderTextureFormat.ARGBFloat);
+    positionMap = new RenderTexture(mapWidth, mapHeight, 0, RenderTextureFormat.ARGBFloat);
     positionMap.enableRandomWrite = true;
     positionMap.Create();
 
@@ -103,24 +130,16 @@ public class VFXdrawVTU : MonoBehaviour
     cs_shader.Dispatch(kernel, 1, 1, 1);
   }
 
-  void InitBuffers()
-  {
-    positionArrayBuffer = new ComputeBuffer(particleNum, Marshal.SizeOf(typeof(Vector3)));
-  }
 
-  void UpdateBuffers()
-  {
-    positionArrayBuffer.SetData(positionArray);
-  }
 
   private Vector3[] LoadVTU(string filePath)
   {
     //ディレクトリ指定してファイルを読み込み
-    var xml = XDocument.Load(filePath);
+    var vtu = XDocument.Load(filePath);
 
     XNamespace ns = "VTK";
 
-    XElement vtk = xml.Element(ns + "VTKFile");
+    XElement vtk = vtu.Element(ns + "VTKFile");
     XElement grid = vtk.Element(ns + "UnstructuredGrid");
     XElement piece = grid.Element(ns + "Piece");
     XElement points = piece.Element(ns + "Points");
@@ -143,15 +162,22 @@ public class VFXdrawVTU : MonoBehaviour
     return pointsArray;
   }
 
-  bool GetPositionArray()
+  void InitBuffers()
   {
-    string path = dataDirectory + "particle_" + string.Format("{0:0000}", xmlNum) + ".vtu";
-    xmlNum++;
-    if (!File.Exists(path))
+    positionArrayBuffer = new ComputeBuffer(particleNum, Marshal.SizeOf(typeof(Vector3)));
+  }
+
+  void UpdateBuffers()
+  {
+    positionArrayBuffer.SetData(positionArray);
+  }
+
+  void DeleteBuffer(ComputeBuffer buffer)
+  {
+    if (buffer != null)
     {
-      return false;
+      buffer.Release();
+      buffer = null;
     }
-    positionArray = LoadVTU(path);
-    return true;
   }
 }
