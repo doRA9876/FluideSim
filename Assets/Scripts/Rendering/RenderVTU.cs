@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.VFX;
 
 [RequireComponent(typeof(VisualEffect))]
-public class VFXdrawVTU : MonoBehaviour
+public class RenderVTU : MonoBehaviour
 {
   struct ThreadSize
   {
@@ -69,16 +69,12 @@ public class VFXdrawVTU : MonoBehaviour
 
     positionArray = LoadVTU(firstFilePath);
     particleNum = positionArray.Length;
-    /*
-    mapWidth = Mathf.CeilToInt(Mathf.Sqrt(particleNum));
-    mapHeight = Mathf.CeilToInt((float)particleNum / mapWidth);
-    */
-    mapWidth = mapHeight = 32;
 
     vfx = GetComponent<VisualEffect>();
     InitBuffers();
     SetupAttributeMaps();
 
+    // Show particle number and position map size
     Debug.Log("particle number : " + particleNum);
     Debug.Log(string.Format("width : {0}, height : {1}\n", mapWidth, mapHeight));
   }
@@ -111,15 +107,22 @@ public class VFXdrawVTU : MonoBehaviour
 
   void SetupAttributeMaps()
   {
-    positionMap = new RenderTexture(mapWidth, mapHeight, 0, RenderTextureFormat.ARGBFloat);
-    positionMap.enableRandomWrite = true;
-    positionMap.Create();
-
+    // Set up kernel
     kernel = cs_shader.FindKernel("CSMain");
     uint threadSizeX, threadSizeY, threadSizeZ;
     cs_shader.GetKernelThreadGroupSizes(kernel, out threadSizeX, out threadSizeY, out threadSizeZ);
     threadSize = new ThreadSize(threadSizeX, threadSizeY, threadSizeZ);
 
+    // Calculate position map size
+    mapWidth = threadSize.x;
+    mapHeight = particleNum / threadSize.x + 1;
+
+    // Set up and Create position map
+    positionMap = new RenderTexture(mapWidth, mapHeight, 0, RenderTextureFormat.ARGBFloat);
+    positionMap.enableRandomWrite = true;
+    positionMap.Create();
+
+    // Set positon map to Compute shader and VFX
     cs_shader.SetTexture(kernel, "_PositionMap", positionMap);
     vfx.SetTexture("Position Map", positionMap);
   }
@@ -131,10 +134,8 @@ public class VFXdrawVTU : MonoBehaviour
   }
 
 
-
   private Vector3[] LoadVTU(string filePath)
   {
-    //ディレクトリ指定してファイルを読み込み
     var vtu = XDocument.Load(filePath);
 
     XNamespace ns = "VTK";
