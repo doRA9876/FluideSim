@@ -139,11 +139,8 @@ public class RenderVTU : MonoBehaviour
 
     XNamespace ns = "VTK";
 
-    XElement vtk = vtu.Element(ns + "VTKFile");
-    XElement grid = vtk.Element(ns + "UnstructuredGrid");
-    XElement piece = grid.Element(ns + "Piece");
-    XElement points = piece.Element(ns + "Points");
-    XElement data = points.Element(ns + "DataArray");
+    XElement piece = vtu.Element(ns + "VTKFile").Element(ns + "UnstructuredGrid").Element(ns + "Piece");
+    XElement data = piece.Element(ns + "Points").Element(ns + "DataArray");
 
     int pointsNum = int.Parse(piece.Attribute("NumberOfPoints").Value);
     int dimension = int.Parse(data.Attribute("NumberOfComponents").Value);
